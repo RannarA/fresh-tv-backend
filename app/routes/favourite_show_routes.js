@@ -8,7 +8,9 @@ module.exports = function (app, db) {
     });
 
     app.post('/favourites', (req, res) => {
-        const favourite = { text: req.body.showId, title: req.body.userId };
+        // TODO user
+        console.log(req.body)
+        const favourite = { showId: req.body.showId, userId: 1 };
         db.collection('favourites').insertOne(favourite, (err, result) => {
             if (err) {
                 res.send({ 'error': 'An error has occurred' });
