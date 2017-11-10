@@ -45,7 +45,6 @@ apiRoutes.post('/authenticate', (req, res) => {
                 res.json({success: false, message: 'Authentication failed'});
             } else {
                 const payload = {
-                    admin: user.admin,
                     userId: user._id
                 };
 
@@ -66,13 +65,15 @@ apiRoutes.post('/authenticate', (req, res) => {
     Authentication guard
  */
 apiRoutes.use((req, res, next) => {
-    const token = req.headers['x-access-token'];
+    const token = req.headers['Authorization'];
 
     if (token) {
         jwt.verify(token, app.get('jwtSecret'), (err, decoded) => {
             if (err) {
-                console.log(err)
-                return res.json({success: false, message: 'Authentication failed'});
+                console.log(err);
+                return res.status(403).send({
+                    message: 'Invalid token'
+                });
             } else {
                 req.decoded = decoded;
                 next();
@@ -80,7 +81,6 @@ apiRoutes.use((req, res, next) => {
         });
     } else {
         res.status(403).send({
-            success: false,
             message: 'Not authenticated'
         });
     }
