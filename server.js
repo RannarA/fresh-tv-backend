@@ -65,8 +65,7 @@ apiRoutes.post('/authenticate', (req, res) => {
     Authentication guard
  */
 apiRoutes.use((req, res, next) => {
-    const token = req.headers['Authorization'];
-
+    const token = req.headers['authorization'];
     if (token) {
         jwt.verify(token, app.get('jwtSecret'), (err, decoded) => {
             if (err) {
@@ -108,6 +107,20 @@ apiRoutes.post('/watchlist', (req, res) => {
             success: true
         });
     })
+});
+
+apiRoutes.delete('/watchlist/:id', (req, res) => {
+    TvShow.findOneAndRemove({userId: req.decoded.userId, showId: req.params.id}, (err, result) => {
+       if (err) {
+           res.status(400).send({
+               message: 'Deletion failed'
+           })
+       } else {
+           res.status(200).send({
+               success: true,
+           })
+       }
+    });
 });
 
 app.use('/api', apiRoutes);
