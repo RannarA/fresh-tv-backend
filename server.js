@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 const config = require('./config/config');
@@ -12,6 +13,9 @@ const TvShow = require('./app/models/tvshow');
 const app = express();
 
 const port = 8000;
+
+const saltRounds = 10;
+
 mongoose.connect(config.database, {
     useMongoClient: true
 });
@@ -57,6 +61,27 @@ apiRoutes.post('/authenticate', (req, res) => {
                     token: token
                 });
             }
+        }
+    })
+});
+
+apiRoutes.post('/sign-up', (req, res) => {
+    let user = {
+        name: req.body.name,
+        password: req.body.password,
+        admin: false
+    };
+
+    User.findOne({
+        name: user.name
+    }, (err, user) => {
+        if (err || user) {
+            res.json({success: false, message: 'Sign up failed'})
+        } else {
+            bcrypt.hash(user.password, saltRounds, function(err, hash) {
+                // Store hash in your password DB.
+                console.log(hash)
+            });
         }
     })
 });
